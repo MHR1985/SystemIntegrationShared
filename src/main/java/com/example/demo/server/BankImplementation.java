@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 public class BankImplementation extends UnicastRemoteObject  implements BankInterface  {
 
-    public static String url = "jdbc:h2:mem:shadybank";
+    public static String url = "jdbc:h2:mem:Bank";
     public static String user = "sa";
     public static String password = "";
     public static String driver = "org.h2.Driver";
@@ -25,10 +25,9 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
 
     public ResultSet runQuery(String query) throws Exception {
         Class.forName(driver);
-        Connection con = DriverManager.getConnection(url, user, password);
+        con = DriverManager.getConnection(url, user, password);
         PreparedStatement ps = con.prepareStatement(query);
-        ResultSet rs=ps.executeQuery();
-        return rs;
+        return ps.executeQuery();
     }
 
     @GetMapping("/millionaires")
@@ -55,6 +54,23 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
         return list;
     }
 
+    @PostMapping("/create")
+    public Customer createCustomer(long id, String name, Double amount) {
+        Customer c = new Customer();
+        c.setId(id);
+        c.setName(name);
+        c.setAmount(amount);
+        try{
+            ResultSet rs = runQuery(
+                    "insert into customer " +
+                            "values ("+id+","+name+","+amount+");");
+            if (rs.next()) con.close(); return c;
+        } catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+
     @GetMapping("/customers")
     public List<Customer> getAllCustomers() {
         List<Customer> list=new ArrayList<Customer>();
@@ -77,11 +93,6 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
             System.out.println(e);
         }
         return list;
-    }
-
-    @PostMapping("/customer")
-    public Customer createCustomer() {
-        return null;
     }
 
     @GetMapping("/customer")

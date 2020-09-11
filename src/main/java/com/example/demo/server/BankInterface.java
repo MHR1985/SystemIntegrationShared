@@ -8,7 +8,7 @@ public interface BankInterface extends Remote {
 
     List<Customer> getMillionaires() throws RemoteException;
 
-    Customer createCustomer() throws RemoteException;
+    Customer createCustomer(long id, String name, Double amount) throws RemoteException;
 
     Customer getCustomer(long id) throws RemoteException;
 
