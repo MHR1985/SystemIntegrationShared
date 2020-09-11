@@ -22,25 +22,24 @@ public class RMIClientDB {
         System.out.println("You have the following options:");
         System.out.println("Press 1 to get all millionares");
         System.out.println("Press 2 to create Customers");
-        switch(scan.next()){
-            case("1"): {
+        switch(scan.nextInt()){
+            case(1): {
                 List<Customer> list= bankInterface.getMillionaires();
                 for(Customer c:list)
                 {
                     System.out.println(c.getId()+ " " + c.getName() + " " + c.getAmount());
                 }
             }
+            case(2): {
+                System.out.println("Enter customer name:");
+                String name = scan.next();
+                Customer create = bankInterface.createCustomer(name, 50000000.0);
+                System.out.println("New customer was created under the name: " + create.getName());
+                System.out.println("Account contains " + create.getAmount());
+            }
         }
 
-        List<Customer> list= bankInterface.getMillionaires();
-        for(Customer c:list)
-        {
-            System.out.println(c.getId()+ " " + c.getName() + " " + c.getAmount());
-        }
 
-        Customer create = bankInterface.createCustomer(3000, "kaj er en haj", 50000000.0);
-        System.out.println("New customer was created under the name: " + create.getName());
-        System.out.println("Account contains " + create.getAmount());
         //Customer customer = bankInterface.getCustomer();
 
     }
