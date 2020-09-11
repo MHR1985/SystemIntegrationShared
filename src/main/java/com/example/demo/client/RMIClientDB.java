@@ -4,6 +4,7 @@ import com.example.demo.server.BankInterface;
 import com.example.demo.server.Customer;
 
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMIClientDB {
@@ -20,7 +21,8 @@ public class RMIClientDB {
             System.out.println(c.getId()+ " " + c.getName() + " " + c.getAmount());
         }
 
-        //Customer customer = bankInterface.getCustomer();
     }
+
+
 
 }
