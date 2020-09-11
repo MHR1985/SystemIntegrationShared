@@ -15,7 +15,7 @@ import java.util.List;
 public class BankImplementation extends UnicastRemoteObject implements BankInterface {
 
 
-    public static String url = "jdbc:h2:file:D:/SystemIntegrationShared/src/main/resources/shadybank/bank;AUTO_SERVER=TRUE";
+    public static String url = "jdbc:h2:file:C:/SystemIntegration_RCI/src/main/resources/shadybank/bank;AUTO_SERVER=TRUE";
     public static String user = "sa";
     public static String password = "";
     public static String driver = "org.h2.Driver";
