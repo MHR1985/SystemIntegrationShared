@@ -12,7 +12,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Entity
-public class Customer {
+public class Customer implements java.io.Serializable {
 
     @Id
     private long id;

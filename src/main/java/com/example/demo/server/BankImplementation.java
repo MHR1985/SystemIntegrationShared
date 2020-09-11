@@ -22,11 +22,9 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
     BankImplementation() throws RemoteException {
     }
 
-    private Connection con;
 
-    public ResultSet runQuery(String query) throws Exception {
+    public ResultSet runQuery(String query, Connection con) throws Exception {
         Class.forName(driver);
-        Connection con = DriverManager.getConnection(url, user, password);
         PreparedStatement ps = con.prepareStatement(query);
         ResultSet rs = ps.executeQuery();
         return rs;
@@ -36,7 +34,8 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
     public List<Customer> getMillionaires() {
         List<Customer> list = new ArrayList<Customer>();
         try {
-            ResultSet rs = runQuery("select * from Customer where amount >= 100000");
+            Connection con = DriverManager.getConnection(url, user, password);
+            ResultSet rs = runQuery("select * from Customer where amount >= 100000", con);
             while (rs.next()) {
                 Customer c = new Customer();
                 c.setId(rs.getLong(1));
@@ -56,7 +55,8 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<Customer>();
         try {
-            ResultSet rs = runQuery("select * from Customer");
+            Connection con = DriverManager.getConnection(url, user, password);
+            ResultSet rs = runQuery("select * from Customer", con);
             while (rs.next()) {
                 Customer c = new Customer();
                 c.setId(rs.getLong(1));
@@ -79,27 +79,29 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
 
     @GetMapping("/customer")
     public Customer getCustomer(@RequestParam long id) throws Exception {
-
-        ResultSet rs = runQuery("select * from Customer where id = '" + id + "'");
-        return getCustomerFromResultSet(rs);
+        Connection con = DriverManager.getConnection(url, user, password);
+        ResultSet rs = runQuery("select * from Customer where id = '" + id + "'", con);
+        return getCustomerFromResultSet(rs, con);
 
     }
 
     @PutMapping("/customer")
     public Customer editCustomer(@RequestParam long id,@RequestParam String name) throws Exception {
-        ResultSet rs = runQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';");
-        return getCustomerFromResultSet(rs);
+        Connection con = DriverManager.getConnection(url, user, password);
+        ResultSet rs = runQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';", con);
+        return getCustomerFromResultSet(rs, con);
     }
 
     @PutMapping("/transfer")
     public Customer transferMoney(@RequestParam long id, @RequestParam double amount) throws Exception {
-        ResultSet rs = runQuery("UPDATE Customer SET amount = '" + amount + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';");
-        return getCustomerFromResultSet(rs);
+        Connection con = DriverManager.getConnection(url, user, password);
+        ResultSet rs = runQuery("UPDATE Customer SET amount = '" + amount + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';", con);
+        return getCustomerFromResultSet(rs, con);
 
     }
 
 
-    private Customer getCustomerFromResultSet(ResultSet rs) {
+    private Customer getCustomerFromResultSet(ResultSet rs, Connection con) {
         try {
             if (rs.next()) {
                 Customer c = new Customer();
