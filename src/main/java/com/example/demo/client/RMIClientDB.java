@@ -27,6 +27,9 @@ public class RMIClientDB {
         System.out.println("New customer was created under the name: " + create.getName());
         System.out.println("Account contains " + create.getAmount());
         //Customer customer = bankInterface.getCustomer();
+
     }
+
+
 
 }

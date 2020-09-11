@@ -12,14 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class BankImplementation extends UnicastRemoteObject  implements BankInterface  {
+public class BankImplementation extends UnicastRemoteObject implements BankInterface {
 
-    public static String url = "jdbc:h2:mem:Bank";
+
+    public static String url = "jdbc:h2:file:D:/SystemIntegrationShared/src/main/resources/shadybank/bank;AUTO_SERVER=TRUE";
     public static String user = "sa";
     public static String password = "";
     public static String driver = "org.h2.Driver";
 
-    BankImplementation()throws RemoteException{}
+    BankImplementation() throws RemoteException {
+    }
 
     private Connection con;
 
@@ -32,13 +34,11 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
 
     @GetMapping("/millionaires")
     public List<Customer> getMillionaires() {
-        List<Customer> list=new ArrayList<Customer>();
-        try
-        {
-            ResultSet rs= runQuery("select * from Customer where amount >= 100000");
-            while(rs.next())
-            {
-                Customer c=new Customer();
+        List<Customer> list = new ArrayList<Customer>();
+        try {
+            ResultSet rs = runQuery("select * from Customer where amount >= 100000");
+            while (rs.next()) {
+                Customer c = new Customer();
                 c.setId(rs.getLong(1));
                 c.setName(rs.getString(2));
                 c.setAmount(rs.getDouble(3));
@@ -46,9 +46,7 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
                 list.add(c);
             }
             con.close();
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e);
         }
         return list;
@@ -73,13 +71,11 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
 
     @GetMapping("/customers")
     public List<Customer> getAllCustomers() {
-        List<Customer> list=new ArrayList<Customer>();
-        try
-        {
-            ResultSet rs= runQuery("select * from Customer");
-            while(rs.next())
-            {
-                Customer c=new Customer();
+        List<Customer> list = new ArrayList<Customer>();
+        try {
+            ResultSet rs = runQuery("select * from Customer");
+            while (rs.next()) {
+                Customer c = new Customer();
                 c.setId(rs.getLong(1));
                 c.setName(rs.getString(2));
                 c.setAmount(rs.getDouble(3));
@@ -87,40 +83,49 @@ public class BankImplementation extends UnicastRemoteObject  implements BankInte
                 list.add(c);
             }
             con.close();
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e);
         }
         return list;
     }
 
     @GetMapping("/customer")
-    public Customer getCustomer(@RequestParam long id) {
+    public Customer getCustomer(@RequestParam long id) throws Exception {
+
+        ResultSet rs = runQuery("select * from Customer where id = '" + id + "'");
+        return getCustomerFromResultSet(rs);
+
+    }
+
+    @PutMapping("/customer")
+    public Customer editCustomer(@RequestParam long id,@RequestParam String name) throws Exception {
+        ResultSet rs = runQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';");
+        return getCustomerFromResultSet(rs);
+    }
+
+    @PutMapping("/transfer")
+    public Customer transferMoney(@RequestParam long id, @RequestParam double amount) throws Exception {
+        ResultSet rs = runQuery("UPDATE Customer SET amount = '" + amount + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';");
+        return getCustomerFromResultSet(rs);
+
+    }
+
+
+    private Customer getCustomerFromResultSet(ResultSet rs) {
         try {
-            ResultSet rs = runQuery("select * from Customer where id = '" + id + "'");
-            if(rs.next())
-            {
-                Customer c= new Customer();
+            if (rs.next()) {
+                Customer c = new Customer();
                 c.setId(rs.getLong(1));
                 c.setName(rs.getString(2));
                 c.setAmount(rs.getDouble(3));
                 con.close();
                 return c;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
         return null;
     }
 
-    @PutMapping("/customer")
-    public Customer editCustomer() {
-        return null;
-    }
-
-    @PutMapping("/transfer")
-    public Customer transferMoney() throws RemoteException {
-        return null;
-    }
 }
+
