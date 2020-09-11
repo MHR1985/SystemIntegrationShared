@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 public class BankImplementation extends UnicastRemoteObject implements BankInterface {
 
-
     public static String url = "jdbc:h2:file:C:/SystemIntegration_RCI/src/main/resources/shadybank/bank;AUTO_SERVER=TRUE";
     public static String user = "sa";
     public static String password = "";
@@ -27,7 +26,7 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
 
     public ResultSet runQuery(String query) throws Exception {
         Class.forName(driver);
-        con = DriverManager.getConnection(url, user, password);
+        Connection con = DriverManager.getConnection(url, user, password);
         PreparedStatement ps = con.prepareStatement(query);
         return ps.executeQuery();
     }
@@ -52,23 +51,6 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         return list;
     }
 
-    @PostMapping("/create")
-    public Customer createCustomer(long id, String name, Double amount) {
-        Customer c = new Customer();
-        c.setId(id);
-        c.setName(name);
-        c.setAmount(amount);
-        try{
-            ResultSet rs = runQuery(
-                    "insert into customer " +
-                            "values ("+id+","+name+","+amount+");");
-            if (rs.next()) con.close(); return c;
-        } catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-        return null;
-    }
-
     @GetMapping("/customers")
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<Customer>();
@@ -87,6 +69,24 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
             System.out.println(e);
         }
         return list;
+    }
+
+
+    @PostMapping("/create")
+    public Customer createCustomer(long id, String name, Double amount) {
+        Customer c = new Customer();
+        c.setId(id);
+        c.setName(name);
+        c.setAmount(amount);
+        try{
+            ResultSet rs = runQuery(
+                    "insert into customer " +
+                            "values ("+id+","+name+","+amount+");");
+            if (rs.next()) con.close(); return c;
+        } catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+        return null;
     }
 
     @GetMapping("/customer")
