@@ -28,8 +28,7 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         Class.forName(driver);
         Connection con = DriverManager.getConnection(url, user, password);
         PreparedStatement ps = con.prepareStatement(query);
-        ResultSet rs = ps.executeQuery();
-        return rs;
+        return ps.executeQuery();
     }
 
     @GetMapping("/millionaires")
@@ -72,8 +71,21 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         return list;
     }
 
-    @PostMapping("/customer")
-    public Customer createCustomer() {
+
+    @PostMapping("/create")
+    public Customer createCustomer(long id, String name, Double amount) {
+        Customer c = new Customer();
+        c.setId(id);
+        c.setName(name);
+        c.setAmount(amount);
+        try{
+            ResultSet rs = runQuery(
+                    "insert into customer " +
+                            "values ("+id+","+name+","+amount+");");
+            if (rs.next()) con.close(); return c;
+        } catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
         return null;
     }
 
