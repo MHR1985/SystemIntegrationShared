@@ -54,6 +54,8 @@ public class RMIClientDB {
                     for (Customer c : allCustomers) {
                         System.out.println("Id: " + c.getId() + " Name: " + c.getName() + " Balance: " + c.getAmount());
                     }
+                    if (allCustomers != null)
+                        System.out.println("There are currently: " + allCustomers.size() + " Customers in the bank");
                     break;
                 }
                 case (4): {
@@ -72,7 +74,6 @@ public class RMIClientDB {
                         ex.printStackTrace();
                     }
                     break;
-
                 }
                 case (5): {
                     run = false;
