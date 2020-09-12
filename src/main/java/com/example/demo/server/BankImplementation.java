@@ -80,7 +80,7 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         try {
             int i = createQuery(
                     "insert into customer(name, amount) " +
-                            "values ('" + name + "'," + amount + ");");
+                    "values ('" + name + "'," + amount + ");");
             if (con != null)
                 con.close();
             if (i != 0){
@@ -135,8 +135,6 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         list.add(sender);
         list.add(receiver);
         return list;
-
-
     }
 
     private Customer getCustomerFromResultSet(ResultSet rs) {
