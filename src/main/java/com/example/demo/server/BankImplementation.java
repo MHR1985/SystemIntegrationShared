@@ -35,6 +35,7 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         return ps.executeUpdate();
     }
 
+    @ResponseBody
     @GetMapping("/millionaires")
     public List<Customer> getMillionaires() {
         List<Customer> list = new ArrayList<Customer>();
@@ -97,10 +98,8 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
 
     @GetMapping("/customer")
     public Customer getCustomer(@RequestParam long id) throws Exception {
-
         ResultSet rs = getQuery("select * from Customer where id = " + id);
         return getCustomerFromResultSet(rs);
-
     }
 
     @PutMapping("/customer")
