@@ -78,16 +78,6 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         return list;
     }
 
-    @Override
-    public Customer editCustomer(long id, String name) throws Exception {
-        return null;
-    }
-
-    @Override
-    public Customer transferMoney(long id, double amount) throws Exception {
-        return null;
-    }
-
 
     @PostMapping("/create")
     public Customer createCustomer(String name, Double amount) {
@@ -108,11 +98,7 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         return null;
     }
 
-    @Override
-    public Customer getCustomer(long id) throws Exception {
-        return null;
-    }
-/*
+
     @GetMapping("/customer")
     public Customer getCustomer(@RequestParam long id) throws Exception {
 
@@ -122,18 +108,27 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
     }
 
     @PutMapping("/customer")
-    public Customer editCustomer    (@RequestParam long id, @RequestParam String name) throws Exception {
-        ResultSet rs = createQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';");
-        return getCustomerFromResultSet(rs);
+    public Customer editCustomer(@RequestParam long id, @RequestParam String name) throws Exception {
+        int i = createQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = '" + id + "';");
+        if (i > 0) {
+            var rs = getQuery(" SELECT * FROM Customer WHERE ID = '" + id + "';");
+            return getCustomerFromResultSet(rs);
+        }
+        return null;
     }
 
     @PutMapping("/transfer")
     public Customer transferMoney(@RequestParam long id, @RequestParam double amount) throws Exception {
-        ResultSet rs = runQuery("UPDATE Customer SET amount = '" + amount + "' WHERE ID = '" + id + "'; SELECT * FROM Customer WHERE ID = '" + id + "';");
-        return getCustomerFromResultSet(rs);
+        int i = createQuery("UPDATE Customer SET amount = '" + amount + "' WHERE ID = '" + id + "';");
+        if(i>0){
+            ResultSet rs = getQuery(" SELECT * FROM Customer WHERE ID = '" + id + "';");
+            return getCustomerFromResultSet(rs);
+        }else{
+            return null;
+        }
+
 
     }
-
 
     private Customer getCustomerFromResultSet(ResultSet rs) {
         try {
@@ -151,7 +146,6 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         return null;
     }
 
- */
-
 }
+
 
