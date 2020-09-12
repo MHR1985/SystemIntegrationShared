@@ -4,10 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,19 +40,23 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         List<Customer> list = new ArrayList<Customer>();
         try {
             ResultSet rs = getQuery("select * from Customer where amount >= 100000");
-            while (rs.next()) {
-                Customer c = new Customer();
-                c.setId(rs.getLong(1));
-                c.setName(rs.getString(2));
-                c.setAmount(rs.getDouble(3));
-                System.out.println(c);
-                list.add(c);
-            }
-            con.close();
+            getListFromResultSet(list, rs);
         } catch (Exception e) {
             System.out.println(e);
         }
         return list;
+    }
+
+    private void getListFromResultSet(List<Customer> list, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            Customer c = new Customer();
+            c.setId(rs.getLong(1));
+            c.setName(rs.getString(2));
+            c.setAmount(rs.getDouble(3));
+            System.out.println(c);
+            list.add(c);
+        }
+        con.close();
     }
 
     @GetMapping("/customers")
@@ -63,15 +64,7 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
         List<Customer> list = new ArrayList<Customer>();
         try {
             ResultSet rs = getQuery("select * from Customer");
-            while (rs.next()) {
-                Customer c = new Customer();
-                c.setId(rs.getLong(1));
-                c.setName(rs.getString(2));
-                c.setAmount(rs.getDouble(3));
-                System.out.println(c);
-                list.add(c);
-            }
-            con.close();
+            getListFromResultSet(list, rs);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -90,8 +83,11 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
                             "values ('" + name + "'," + amount + ");");
             if (con != null)
                 con.close();
-            if (i != 0)
-                return c;
+            if (i != 0){
+                ResultSet rs = getQuery("SELECT * FROM Customer WHERE name = '"+name+"' AND amount = "+amount);
+                return getCustomerFromResultSet(rs);
+            }
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -102,16 +98,16 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
     @GetMapping("/customer")
     public Customer getCustomer(@RequestParam long id) throws Exception {
 
-        ResultSet rs = getQuery("select * from Customer where id = '" + id + "'");
+        ResultSet rs = getQuery("select * from Customer where id = " + id);
         return getCustomerFromResultSet(rs);
 
     }
 
     @PutMapping("/customer")
     public Customer editCustomer(@RequestParam long id, @RequestParam String name) throws Exception {
-        int i = createQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = '" + id + "';");
+        int i = createQuery("UPDATE Customer SET name = '" + name + "' WHERE ID = " + id);
         if (i > 0) {
-            var rs = getQuery(" SELECT * FROM Customer WHERE ID = '" + id + "';");
+            var rs = getQuery(" SELECT * FROM Customer WHERE ID = " + id);
             return getCustomerFromResultSet(rs);
         }
         return null;
@@ -119,9 +115,9 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
 
     @PutMapping("/transfer")
     public Customer transferMoney(@RequestParam long id, @RequestParam double amount) throws Exception {
-        int i = createQuery("UPDATE Customer SET amount = '" + amount + "' WHERE ID = '" + id + "';");
+        int i = createQuery("UPDATE Customer SET amount = " + amount + " WHERE ID = " + id);
         if(i>0){
-            ResultSet rs = getQuery(" SELECT * FROM Customer WHERE ID = '" + id + "';");
+            ResultSet rs = getQuery(" SELECT * FROM Customer WHERE ID = " + id);
             return getCustomerFromResultSet(rs);
         }else{
             return null;
