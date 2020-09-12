@@ -16,6 +16,6 @@ public interface BankInterface extends Remote {
 
     Customer editCustomer(long id, String name) throws Exception;
 
-    Customer transferMoney(long id, double amount) throws Exception;
+    List<Customer> transferMoney(long idSender, long idReceiver, double amount) throws Exception;
 
 }

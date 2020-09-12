@@ -114,14 +114,27 @@ public class BankImplementation extends UnicastRemoteObject implements BankInter
     }
 
     @PutMapping("/transfer")
-    public Customer transferMoney(@RequestParam long id, @RequestParam double amount) throws Exception {
-        int i = createQuery("UPDATE Customer SET amount = " + amount + " WHERE ID = " + id);
+    public List<Customer> transferMoney(@RequestParam long idSender,@RequestParam long idReceiver, @RequestParam double amount) throws Exception {
+        Customer sender = null;
+        Customer receiver = null;
+        ResultSet rs = getQuery(" SELECT * FROM Customer WHERE ID = " + idSender);
+        sender = getCustomerFromResultSet(rs);
+        int i = createQuery("UPDATE Customer SET amount = " + (sender.getAmount()-amount) + " WHERE ID = " + idSender);
         if(i>0){
-            ResultSet rs = getQuery(" SELECT * FROM Customer WHERE ID = " + id);
-            return getCustomerFromResultSet(rs);
-        }else{
-            return null;
+            rs = getQuery(" SELECT * FROM Customer WHERE ID = " + idSender);
+            sender = getCustomerFromResultSet(rs);
         }
+        rs = getQuery(" SELECT * FROM Customer WHERE ID = " + idReceiver);
+        receiver = getCustomerFromResultSet(rs);
+        i = createQuery("UPDATE Customer SET amount = " + (receiver.getAmount()+amount) + " WHERE ID = " + idReceiver);
+        if(i>0){
+            rs = getQuery(" SELECT * FROM Customer WHERE ID = " + idReceiver);
+            receiver = getCustomerFromResultSet(rs);
+        }
+        List<Customer> list = new ArrayList<Customer>();
+        list.add(sender);
+        list.add(receiver);
+        return list;
 
 
     }
